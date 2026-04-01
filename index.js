@@ -9,8 +9,8 @@ const {
     EmbedBuilder
 } = require('discord.js');
 
-const ticketLogChannelId = "1488962491818967301";
-const chatlogChannelId = "1488962511150649364";
+const ticketLogChannelId = "YOUR_TICKET_LOG_CHANNEL_ID";
+const chatlogChannelId = "YOUR_CHATLOG_CHANNEL_ID";
 
 const client = new Client({
     intents: [
@@ -34,8 +34,15 @@ client.on('messageCreate', async (message) => {
                 .setStyle(ButtonStyle.Primary)
         );
 
+        const embed = new EmbedBuilder()
+            .setTitle('D4an Texture Tickets')
+            .setDescription('Click the button below to receive assistance from our staff team with any issue.')
+            .setImage('https://media.discordapp.net/attachments/1488907627114135702/1488926655115169883/discordbanner.png?ex=69ce8e81&is=69cd3d01&hm=c248de3403985322e462c5bb473c5e308171a43292e9ffc39565ccf6274cf8e8&=&format=webp&quality=lossless&width=1027&height=560') // Replace with your image URL
+            .setColor(0xFF9527)
+            .setFooter({ text: 'Support Team' });
+
         await message.channel.send({
-            content: 'Click the button below to receive assistance from our staff team with any issue.',
+            embeds: [embed],
             components: [row]
         });
     }
