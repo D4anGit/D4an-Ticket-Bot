@@ -9,8 +9,8 @@ const {
     EmbedBuilder
 } = require('discord.js');
 
-const ticketLogChannelId = "YOUR_TICKET_LOG_CHANNEL_ID";
-const chatlogChannelId = "YOUR_CHATLOG_CHANNEL_ID";
+const ticketLogChannelId = "1488962491818967301";
+const chatlogChannelId = "1488962511150649364";
 
 const client = new Client({
     intents: [
