@@ -1,5 +1,5 @@
 const { Client, GatewayIntentBits, Partials, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField, EmbedBuilder } = require('discord.js');
-const { token, ticketLogChannelId, chatlogChannelId } = require('./config.json');
+client.login(process.env.TOKEN);
 
 const client = new Client({
     intents: [
@@ -176,5 +176,3 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
 });
-
-client.login(token);
