@@ -58,7 +58,7 @@ client.on('guildMemberAdd', async (member) => {
             const welcomeEmbed = new EmbedBuilder()
                 .setTitle(`Welcome to the server, ${member.user.username}!`)
                 .setDescription(`We're glad to have you here! 🎉\n\nFeel free to explore and don't hesitate to ask if you need help.`)
-                .setColor(0x00ff00)
+                .setColor(0xFF9527)
                 .setThumbnail(member.user.displayAvatarURL())
                 .setFooter({ text: `Member #${member.guild.memberCount}` });
 
