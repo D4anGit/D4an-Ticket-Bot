@@ -11,18 +11,105 @@ const {
 
 const ticketLogChannelId = "1488962491818967301";
 const chatlogChannelId = "1488962511150649364";
+const welcomeChannelId = "1488858798356693165";
+const invitesChannelId = "1488858798356693167";
+
+// Map to store user invite counts: userId -> inviteCount
+const userInvites = new Map();
 
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildInvites
     ],
     partials: [Partials.Channel]
 });
 
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log(`Logged in as ${client.user.tag}`);
+    
+    // Initialize invite counts on bot startup
+    try {
+        const guild = client.guilds.cache.first();
+        if (guild) {
+            const invites = await guild.invites.fetch();
+            invites.forEach(invite => {
+                if (invite.inviter) {
+                    const currentCount = userInvites.get(invite.inviter.id) || 0;
+                    userInvites.set(invite.inviter.id, currentCount + invite.uses);
+                }
+            });
+            console.log('Invite counts initialized');
+        }
+    } catch (error) {
+        console.error('Error initializing invites:', error);
+    }
+});
+
+client.on('guildMemberAdd', async (member) => {
+    try {
+        // Send welcome message
+        const welcomeChannel = await client.channels.fetch(welcomeChannelId);
+        
+        if (welcomeChannel) {
+            const welcomeEmbed = new EmbedBuilder()
+                .setTitle(`Welcome to the server, ${member.user.username}!`)
+                .setDescription(`We're glad to have you here! 🎉\n\nFeel free to explore and don't hesitate to ask if you need help.`)
+                .setColor(0x00ff00)
+                .setThumbnail(member.user.displayAvatarURL())
+                .setFooter({ text: `Member #${member.guild.memberCount}` });
+
+            await welcomeChannel.send({
+                content: `<@${member.id}>`,
+                embeds: [welcomeEmbed]
+            });
+        }
+
+        // Check who invited them
+        const invites = await member.guild.invites.fetch();
+        let inviter = null;
+        let inviteCode = null;
+
+        for (const invite of invites.values()) {
+            if (invite.inviter && userInvites.has(invite.inviter.id)) {
+                const previousUses = userInvites.get(invite.inviter.id) || 0;
+                if (invite.uses > previousUses) {
+                    inviter = invite.inviter;
+                    inviteCode = invite.code;
+                    userInvites.set(inviter.id, invite.uses);
+                    break;
+                }
+            }
+        }
+
+        // Send invite logging message
+        if (inviter) {
+            const inviteCount = userInvites.get(inviter.id) || 0;
+            const invitesChannel = await client.channels.fetch(invitesChannelId);
+
+            if (invitesChannel) {
+                const inviteEmbed = new EmbedBuilder()
+                    .setTitle('📊 Member Invited')
+                    .setDescription(`<@${inviter.id}> invited <@${member.id}>`)
+                    .addFields(
+                        { name: 'Inviter', value: inviter.tag, inline: true },
+                        { name: 'New Member', value: member.user.tag, inline: true },
+                        { name: 'Total Invites', value: `${inviteCount}`, inline: true },
+                        { name: 'Invite Code', value: inviteCode || 'Unknown', inline: true },
+                        { name: 'Joined At', value: `<t:${Math.floor(member.joinedTimestamp / 1000)}:f>` }
+                    )
+                    .setColor(0x0099ff)
+                    .setThumbnail(member.user.displayAvatarURL());
+
+                await invitesChannel.send({ embeds: [inviteEmbed] });
+            }
+        }
+    } catch (error) {
+        console.error('Error handling new member:', error);
+    }
 });
 
 client.on('messageCreate', async (message) => {
