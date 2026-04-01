@@ -12,6 +12,7 @@ const {
 const ticketLogChannelId = "YOUR_TICKET_LOG_CHANNEL_ID";
 const chatlogChannelId = "YOUR_CHATLOG_CHANNEL_ID";
 
+const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
@@ -79,7 +80,6 @@ client.on('interactionCreate', async (interaction) => {
             components: [closeRow]
         });
 
-       
         try {
             const logChannel = await client.channels.fetch(ticketLogChannelId);
 
