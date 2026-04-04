@@ -87,7 +87,7 @@ client.on('guildMemberAdd', async (member) => {
         let inviteCode = null;
 
         for (const invite of invites.values()) {
-            if (invite.inviter && userInvites.has(invite.inviter.id)) {
+            if (invite.inviter) {
                 const previousUses = userInvites.get(invite.inviter.id) || 0;
                 if (invite.uses > previousUses) {
                     inviter = invite.inviter;
